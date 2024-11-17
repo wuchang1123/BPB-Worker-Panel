@@ -5101,7 +5101,7 @@ async function getConfigAddresses(hostName, cleanIPs, enableIPv6) {
   const defaultIPv6 = enableIPv6 ? resolved.ipv6.map((ip) => `[${ip}]`) : [];
   return [
     hostName,
-    "www.speedtest.net",
+    "www.spdtest.net",
     ...resolved.ipv4,
     ...defaultIPv6,
     ...cleanIPs ? cleanIPs.split(",") : []
@@ -6914,7 +6914,7 @@ async function buildXrayDNS(proxySettings, outboundAddrs, domainToStaticIPs, isW
     dnsObject.hosts["cloudflare-dns.com"] = [
       ...resolvedDOH.ipv4,
       ...resolvedCloudflare.ipv4,
-      ...resolvedCLDomain.ipv4,
+      //...resolvedCLDomain.ipv4,
       ...resolvedCFNS_1.ipv4,
       ...resolvedCFNS_2.ipv4
     ];
