@@ -6785,7 +6785,7 @@ function extractChainProxyParams(chainProxy) {
     return null;
   let url = new URL(chainProxy);
   const protocol = url.protocol.slice(0, -1);
-  if (protocol === "vle" + "ss") {
+  if (protocol === "vless") {
     const params = new URLSearchParams(url.search);
     configParams = {
       protocol,
