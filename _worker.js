@@ -4328,7 +4328,13 @@ var worker_default = {
               }
             });
           default:
-            return new Response("Please enter a new!", { status: 200, headers: { "Content-Type": "text/html" } });
+            return new Response(`
+                <html style="margin:0;">
+                <body style="margin:0;">
+                <img src='https://xiaoxintv.cc/upload/vod/20240522-1/c475b43b6a6c09a5b01f04a119cc0518.jpg' style="margin:0;width:100%;height:auto;" />
+                </body>
+                </html>
+            `, { status: 200, headers: { "Content-Type": "text/html" } });
             //url.hostname = "www.speedtest.net";
             //url.protocol = "https:";
             //request = new Request(url, request);
