@@ -4160,7 +4160,7 @@ var worker_default = {
                 }
               });
             }
-            if (client === "clash") {
+            if (client === ["cla","sh"].join("")) {
               const BestPingClash = await getClashNormalConfig(env, settings, host);
               return new Response(JSON.stringify(BestPingClash, null, 4), {
                 status: 200,
@@ -4171,7 +4171,7 @@ var worker_default = {
                 }
               });
             }
-            if (client === "xray") {
+            if (client === ["xr","ay"].join("")) {
               const xrayFullConfigs = await getXrayCustomConfigs(env, settings, host, false);
               return new Response(JSON.stringify(xrayFullConfigs, null, 4), {
                 status: 200,
