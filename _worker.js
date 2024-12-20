@@ -4191,7 +4191,7 @@ var worker_default = {
                 "CDN-Cache-Control": "no-store"
               }
             });
-          case `/fragsub/${userID}`:
+          case `/fragsubsub/${userID}`:
             let fragConfigs = client === "hiddify" ? await getSingBoxCustomConfig(env, settings, host, client, true) : await getXrayCustomConfigs(env, settings, host, true);
             return new Response(JSON.stringify(fragConfigs, null, 4), {
               status: 200,
@@ -4201,7 +4201,7 @@ var worker_default = {
                 "CDN-Cache-Control": "no-store"
               }
             });
-          case `/warpsub/${userID}`:
+          case `/warpsubsub/${userID}`:
             if (client === "clash") {
               const clashWarpConfig = await getClashWarpConfig(settings, warpConfigs);
               return new Response(JSON.stringify(clashWarpConfig, null, 4), {
