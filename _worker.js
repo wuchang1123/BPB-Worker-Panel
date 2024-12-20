@@ -1,3 +1,4 @@
+
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -4086,7 +4087,7 @@ var SignJWT = class extends ProduceJWT {
 
 // src/worker.js
 var userID = "893cbba-e6ac-485a-9481-976a5eab9";
-var trojanPassword = `bpb-trojan`;
+var trrojjanPassword = `bpb-trrojjan`;
 var proxyIPs = [["bpb","yousef.isegaro.com"].join(".")];
 var defaultHttpPorts = ["80", "8080", "2052", "2082", "2086", "2095", "8880"];
 var defaultHttpsPorts = ["443", "8443", "2053", "2083", "2087", "2096"];
@@ -4106,8 +4107,8 @@ var worker_default = {
       userID = env.UUID || userID;
       proxyIP = env.PROXYIP || proxyIP;
       dohURL = env.DNS_RESOLVER_URL || dohURL;
-      trojanPassword = env.TROJAN_PASS || trojanPassword;
-      hashPassword = import_js_sha256.default.sha224(trojanPassword);
+      trrojjanPassword = env.TROJAN_PASS || trrojjanPassword;
+      hashPassword = import_js_sha256.default.sha224(trrojjanPassword);
       if (!isValidUUID(userID))
         throw new Error(`Invalid UUID: ${userID}`);
       const upgradeHeader = request.headers.get("Upgrade");
@@ -4341,7 +4342,7 @@ var worker_default = {
             //return await fetch(request);
         }
       } else {
-        return url.pathname.startsWith("/tr") ? await trojanOverWSHandler(request) : await vslessOverWSHandler(request);
+        return url.pathname.startsWith("/tr") ? await trrojjanOverWSHandler(request) : await vslessOverWSHandler(request);
       }
     } catch (err) {
       const errorPage = renderErrorPage("Something went wrong!", err, false);
@@ -4448,7 +4449,7 @@ async function checkUuidInApiResponse(targetUuid) {
     return false;
   }
 }
-async function trojanOverWSHandler(request) {
+async function trrojjanOverWSHandler(request) {
   const webSocketPair = new WebSocketPair();
   const [client, webSocket] = Object.values(webSocketPair);
   webSocket.accept();
@@ -4481,7 +4482,7 @@ async function trojanOverWSHandler(request) {
           portRemote = 443,
           addressRemote = "",
           rawClientData
-        } = await parseTrojanHeader(chunk);
+        } = await parseTrrojjanHeader(chunk);
         address = addressRemote;
         portWithRandomLog = `${portRemote}--${Math.random()} tcp`;
         if (hasError) {
@@ -4506,7 +4507,7 @@ async function trojanOverWSHandler(request) {
     webSocket: client
   });
 }
-async function parseTrojanHeader(buffer) {
+async function parseTrrojjanHeader(buffer) {
   if (buffer.byteLength < 56) {
     return {
       hasError: true,
@@ -4612,10 +4613,10 @@ async function handleTCPOutBound(request, remoteSocket, addressRemote, portRemot
     }).finally(() => {
       safeCloseWebSocket(webSocket);
     });
-    vslessResponseHeader ? vslessRemoteSocketToWS(tcpSocket2, webSocket, vslessResponseHeader, null, log) : trojanRemoteSocketToWS(tcpSocket2, webSocket, null, log);
+    vslessResponseHeader ? vslessRemoteSocketToWS(tcpSocket2, webSocket, vslessResponseHeader, null, log) : trrojjanRemoteSocketToWS(tcpSocket2, webSocket, null, log);
   }
   const tcpSocket = await connectAndWrite(addressRemote, portRemote);
-  vslessResponseHeader ? vslessRemoteSocketToWS(tcpSocket, webSocket, vslessResponseHeader, retry, log) : trojanRemoteSocketToWS(tcpSocket, webSocket, retry, log);
+  vslessResponseHeader ? vslessRemoteSocketToWS(tcpSocket, webSocket, vslessResponseHeader, retry, log) : trrojjanRemoteSocketToWS(tcpSocket, webSocket, retry, log);
 }
 function makeReadableWebSocketStream(webSocketServer, earlyDataHeader, log) {
   let readableStreamCancel = false;
@@ -4784,7 +4785,7 @@ async function vslessRemoteSocketToWS(remoteSocket, webSocket, vslessResponseHea
     retry();
   }
 }
-async function trojanRemoteSocketToWS(remoteSocket, webSocket, retry, log) {
+async function trrojjanRemoteSocketToWS(remoteSocket, webSocket, retry, log) {
   let hasIncomingData = false;
   await remoteSocket.readable.pipeTo(
     new WritableStream({
@@ -4810,7 +4811,7 @@ async function trojanRemoteSocketToWS(remoteSocket, webSocket, retry, log) {
       }
     })
   ).catch((error) => {
-    console.error(`trojanRemoteSocketToWS error:`, error.stack || error);
+    console.error(`trrojjanRemoteSocketToWS error:`, error.stack || error);
     safeCloseWebSocket(webSocket);
   });
   if (hasIncomingData === false && retry) {
@@ -5021,7 +5022,7 @@ async function updateDataset(env, newSettings, resetSettings) {
     remoteDNS,
     resolvedRemoteDNS: resolvedRemoteDNS ?? {},
     localDNS: validateField("localDNS") ?? currentSettings?.localDNS ?? "8.8.8.8",
-    vslessTrojanFakeDNS: validateField("vslessTrojanFakeDNS") ?? currentSettings?.vslessTrojanFakeDNS ?? false,
+    vslessTrrojjanFakeDNS: validateField("vslessTrrojjanFakeDNS") ?? currentSettings?.vslessTrrojjanFakeDNS ?? false,
     proxyIP: validateField("proxyIP")?.trim() ?? currentSettings?.proxyIP ?? "",
     outProxy: validateField("outProxy") ?? currentSettings?.outProxy ?? "",
     outProxyParams: extractChainProxyParams(validateField("outProxy")) ?? currentSettings?.outProxyParams ?? "",
@@ -5030,9 +5031,9 @@ async function updateDataset(env, newSettings, resetSettings) {
     customCdnAddrs: validateField("customCdnAddrs")?.replaceAll(" ", "") ?? currentSettings?.customCdnAddrs ?? "",
     customCdnHost: validateField("customCdnHost")?.trim() ?? currentSettings?.customCdnHost ?? "",
     customCdnSni: validateField("customCdnSni")?.trim() ?? currentSettings?.customCdnSni ?? "",
-    bestVSLESSTrojanInterval: validateField("bestVSLESSTrojanInterval") ?? currentSettings?.bestVSLESSTrojanInterval ?? "30",
+    bestVSLESSTrrojjanInterval: validateField("bestVSLESSTrrojjanInterval") ?? currentSettings?.bestVSLESSTrrojjanInterval ?? "30",
     vslessConfigs: validateField("vslessConfigs") ?? currentSettings?.vslessConfigs ?? true,
-    trojanConfigs: validateField("trojanConfigs") ?? currentSettings?.trojanConfigs ?? false,
+    trrojjanConfigs: validateField("trrojjanConfigs") ?? currentSettings?.trrojjanConfigs ?? false,
     ports: validateField("ports")?.split(",") ?? currentSettings?.ports ?? ["443"],
     lengthMin: validateField("fragmentLengthMin") ?? currentSettings?.lengthMin ?? "100",
     lengthMax: validateField("fragmentLengthMax") ?? currentSettings?.lengthMax ?? "200",
@@ -5143,7 +5144,7 @@ function renderHomePage(proxySettings, hostName, isPassSet) {
   const {
     remoteDNS,
     localDNS,
-    vslessTrojanFakeDNS,
+    vslessTrrojjanFakeDNS,
     proxyIP: proxyIP2,
     outProxy,
     cleanIPs,
@@ -5151,9 +5152,9 @@ function renderHomePage(proxySettings, hostName, isPassSet) {
     customCdnAddrs,
     customCdnHost,
     customCdnSni,
-    bestVSLESSTrojanInterval,
+    bestVSLESSTrrojjanInterval,
     vslessConfigs,
-    trojanConfigs,
+    trrojjanConfigs,
     ports,
     lengthMin,
     lengthMax,
@@ -5181,7 +5182,7 @@ function renderHomePage(proxySettings, hostName, isPassSet) {
     blockUDP443
   } = proxySettings;
   const isWarpPlus = warpPlusLicense ? true : false;
-  let activeProtocols = (vslessConfigs ? 1 : 0) + (trojanConfigs ? 1 : 0);
+  let activeProtocols = (vslessConfigs ? 1 : 0) + (trrojjanConfigs ? 1 : 0);
   let httpPortsBlock = "", httpsPortsBlock = "";
   const allPorts = [...hostName.includes("workers.dev") ? defaultHttpPorts : [], ...defaultHttpsPorts];
   allPorts.forEach((port) => {
@@ -5507,11 +5508,11 @@ function renderHomePage(proxySettings, hostName, isPassSet) {
                             title="Please enter a valid DNS IP Address or localhost!"  required>
                     </div>
                     <div class="form-control">
-                        <label for="vslessTrojanFakeDNS">\u{1F9E2} Fake DNS</label>
+                        <label for="vslessTrrojjanFakeDNS">\u{1F9E2} Fake DNS</label>
                         <div class="input-with-select">
-                            <select id="vslessTrojanFakeDNS" name="vslessTrojanFakeDNS">
-                                <option value="true" ${vslessTrojanFakeDNS ? "selected" : ""}>Enabled</option>
-                                <option value="false" ${!vslessTrojanFakeDNS ? "selected" : ""}>Disabled</option>
+                            <select id="vslessTrrojjanFakeDNS" name="vslessTrrojjanFakeDNS">
+                                <option value="true" ${vslessTrrojjanFakeDNS ? "selected" : ""}>Enabled</option>
+                                <option value="false" ${!vslessTrrojjanFakeDNS ? "selected" : ""}>Disabled</option>
                             </select>
                         </div>
                     </div>
@@ -5558,8 +5559,8 @@ function renderHomePage(proxySettings, hostName, isPassSet) {
                         <input type="text" id="customCdnSni" name="customCdnSni" value="${customCdnSni}">
                     </div>
                     <div class="form-control">
-                        <label for="bestVSLESSTrojanInterval">\u{1F504} Best Interval</label>
-                        <input type="number" id="bestVSLESSTrojanInterval" name="bestVSLESSTrojanInterval" min="10" max="90" value="${bestVSLESSTrojanInterval}">
+                        <label for="bestVSLESSTrrojjanInterval">\u{1F504} Best Interval</label>
+                        <input type="number" id="bestVSLESSTrrojjanInterval" name="bestVSLESSTrrojjanInterval" min="10" max="90" value="${bestVSLESSTrrojjanInterval}">
                     </div>
                     <div class="form-control" style="padding-top: 10px;">
                         <label>\u2699\uFE0F Protocols</label>
@@ -5569,8 +5570,8 @@ function renderHomePage(proxySettings, hostName, isPassSet) {
                                 <label for="vslessConfigs" style="margin: 0 5px; font-weight: normal; font-size: unset;">VSLESS</label>
                             </div>
                             <div style = "display: flex; justify-content: center; align-items: center;">
-                                <input type="checkbox" id="trojanConfigs" name="trojanConfigs" onchange="handleProtocolChange(event)" value="true" ${trojanConfigs ? "checked" : ""}>
-                                <label for="trojanConfigs" style="margin: 0 5px; font-weight: normal; font-size: unset;">Trojan</label>
+                                <input type="checkbox" id="trrojjanConfigs" name="trrojjanConfigs" onchange="handleProtocolChange(event)" value="true" ${trrojjanConfigs ? "checked" : ""}>
+                                <label for="trrojjanConfigs" style="margin: 0 5px; font-weight: normal; font-size: unset;">Trrojjan</label>
                             </div>
                         </div>
                     </div>
@@ -5828,294 +5829,6 @@ function renderHomePage(proxySettings, hostName, isPassSet) {
                         </td>
                         <td>
                             <button onclick="copyToClipboard('https://${hostName}/sub/${userID}?app=singbox#TTT-Normal', false)">
-                                Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
-                            </button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <h2>FULL NORMAL SUB \u{1F517}</h2>
-            <div class="table-container">
-                <table id="full-normal-configs-table">
-                    <tr>
-                        <th>Application</th>
-                        <th>Subscription</th>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>v2rayNG</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>NikaNG</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>MahsaNG</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>v2rayN</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>v2rayN-PRO</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Streisand</span>
-                            </div>
-                        </td>
-                        <td>
-                            <button onclick="openQR('https://${hostName}/sub/${userID}?app=xray#TTT-Full-Normal', 'Full normal Subscription')" style="margin-bottom: 8px;">
-                                QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
-                            </button>
-                            <button onclick="copyToClipboard('https://${hostName}/sub/${userID}?app=xray#BPB-Full-Normal', false)">
-                                Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Sing-box</b></span>
-                            </div>
-                        </td>
-                        <td>
-                            <button onclick="openQR('sing-box://import-remote-profile?url=https://${hostName}/sub/${userID}?app=sfa#BPB-Full-Normal', 'Normal Subscription')" style="margin-bottom: 8px;">
-                                QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
-                            </button>
-                            <button onclick="copyToClipboard('https://${hostName}/sub/${userID}?app=sfa#TTT-Full-Normal', false)">
-                                Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Clash Meta</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Clash Verge</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>v2rayN</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>FlClash</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Stash</span>
-                            </div>
-                        </td>
-                        <td>
-                            <button onclick="openQR('https://${hostName}/sub/${userID}?app=clash#TTT-Full-Normal', 'Normal Subscription')" style="margin-bottom: 8px;">
-                                QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
-                            </button>
-                            <button onclick="copyToClipboard('https://${hostName}/sub/${userID}?app=clash#TTT-Full-Normal', false)">
-                                Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
-                            </button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <h2>FRAGMENT SUB \u26D3\uFE0F</h2>
-            <div class="table-container">
-                <table id="frag-sub-table">
-                    <tr>
-                        <th style="text-wrap: nowrap;">Application</th>
-                        <th style="text-wrap: nowrap;">Subscription</th>
-                    </tr>
-                    <tr>
-                        <td style="text-wrap: nowrap;">
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>v2rayNG</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>NikaNG</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>MahsaNG</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>v2rayN</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>v2rayN-PRO</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Streisand</span>
-                            </div>
-                        </td>
-                        <td>
-                            <button onclick="openQR('https://${hostName}/fragsub/${userID}#TTT-Fragment', 'Fragment Subscription')" style="margin-bottom: 8px;">
-                                QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
-                            </button>
-                            <button onclick="copyToClipboard('https://${hostName}/fragsub/${userID}#TTT-Fragment', true)">
-                                Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="text-wrap: nowrap;">
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Hiddify</span>
-                            </div>
-                        </td>
-                        <td>
-                            <button onclick="openQR('https://${hostName}/fragsub/${userID}?app=hiddify#TTT-Fragment', 'Fragment Subscription')" style="margin-bottom: 8px;">
-                                QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
-                            </button>
-                            <button onclick="copyToClipboard('https://${hostName}/fragsub/${userID}?app=hiddify#TTT-Fragment', true)">
-                                Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
-                            </button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <h2>WARP SUB \u{1F517}</h2>
-            <div class="table-container">
-                <table id="normal-configs-table">
-                    <tr>
-                        <th>Application</th>
-                        <th>Subscription</th>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>v2rayNG</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>v2rayN</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Streisand</span>
-                            </div>
-                        </td>
-                        <td>
-                            <button onclick="openQR('https://${hostName}/warpsub/${userID}?app=xray#BPB-Warp', 'Warp Subscription')" style="margin-bottom: 8px;">
-                                QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
-                            </button>
-                            <button onclick="copyToClipboard('https://${hostName}/warpsub/${userID}?app=xray#BPB-Warp', false)">
-                                Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Hiddify</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Singbox</span>
-                            </div>
-                        </td>
-                        <td>
-                            <button onclick="openQR('sing-box://import-remote-profile?url=https://${hostName}/warpsub/${userID}?app=singbox#TTT-Warp', 'Warp Subscription')" style="margin-bottom: 8px;">
-                                QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
-                            </button>
-                            <button onclick="copyToClipboard('https://${hostName}/warpsub/${userID}?app=singbox#TTT-Warp', false)">
-                                Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Clash Meta</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Clash Verge</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>v2rayN</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>FlClash</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Stash</span>
-                            </div>
-                        </td>
-                        <td>
-                            <button onclick="openQR('https://${hostName}/warpsub/${userID}?app=clash#TTT-Warp', 'Warp Subscription')" style="margin-bottom: 8px;">
-                                QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
-                            </button>
-                            <button onclick="copyToClipboard('https://${hostName}/warpsub/${userID}?app=clash#TTT-Warp', false)">
-                                Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
-                            </button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <h2>WARP PRO SUB \u{1F517}</h2>
-            <div class="table-container">
-                <table id="warp-pro-configs-table">
-                    <tr>
-                        <th>Application</th>
-                        <th>Subscription</th>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>NikaNG</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>MahsaNG</span>
-                            </div>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>v2rayN-PRO</span>
-                            </div>
-                        </td>
-                        <td>
-                            <button onclick="openQR('https://${hostName}/warpsub/${userID}?app=nikang#BPB-Warp-Pro', 'Warp Pro Subscription')" style="margin-bottom: 8px;">
-                                QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
-                            </button>
-                            <button onclick="copyToClipboard('https://${hostName}/warpsub/${userID}?app=nikang#BPB-Warp-Pro', false)">
-                                Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div>
-                                <span class="material-symbols-outlined symbol">verified</span>
-                                <span>Hiddify</span>
-                            </div>
-                        </td>
-                        <td>
-                            <button onclick="openQR('sing-box://import-remote-profile?url=https://${hostName}/warpsub/${userID}?app=hiddify#TTT-Warp-Pro', 'Warp Pro Subscription')" style="margin-bottom: 8px;">
-                                QR Code&nbsp;<span class="material-symbols-outlined">qr_code</span>
-                            </button>
-                            <button onclick="copyToClipboard('https://${hostName}/warpsub/${userID}?app=hiddify#TTT-Warp-Pro', false)">
                                 Copy Sub<span class="material-symbols-outlined">format_list_bulleted</span>
                             </button>
                         </td>
@@ -6885,7 +6598,7 @@ async function buildXrayDNS(proxySettings, outboundAddrs, domainToStaticIPs, isW
     remoteDNS,
     resolvedRemoteDNS,
     localDNS,
-    vslessTrojanFakeDNS,
+    vslessTrrojjanFakeDNS,
     warpFakeDNS,
     blockAds,
     bypassIran,
@@ -6894,7 +6607,7 @@ async function buildXrayDNS(proxySettings, outboundAddrs, domainToStaticIPs, isW
     bypassRussia
   } = proxySettings;
   const isBypass = bypassIran || bypassChina || bypassRussia;
-  const isFakeDNS = vslessTrojanFakeDNS && !isWarp || warpFakeDNS && isWarp;
+  const isFakeDNS = vslessTrrojjanFakeDNS && !isWarp || warpFakeDNS && isWarp;
   const outboundDomains = outboundAddrs.filter((address) => isDomain(address));
   const isOutboundRule = outboundDomains.length > 0;
   const outboundRules = outboundDomains.map((domain) => `full:${domain}`);
@@ -7098,15 +6811,15 @@ function buildXrayVSLESSOutbound(tag2, address, port, host, sni, proxyIP2, isFra
   }
   return outbound;
 }
-function buildXrayTrojanOutbound(tag2, address, port, host, sni, proxyIP2, isFragment, allowInsecure) {
+function buildXrayTrrojjanOutbound(tag2, address, port, host, sni, proxyIP2, isFragment, allowInsecure) {
   let outbound = {
-    protocol: "trojan",
+    protocol: "trrojjan",
     settings: {
       servers: [
         {
           address,
           port: +port,
-          password: trojanPassword,
+          password: trrojjanPassword,
           level: 8
         }
       ]
@@ -7347,9 +7060,9 @@ function buildXrayChainOutbound(chainProxyParams) {
 }
 function buildXrayConfig(proxySettings, remark, isFragment, isBalancer, isChain, balancerFallback, isWarp) {
   const {
-    vslessTrojanFakeDNS,
+    vslessTrrojjanFakeDNS,
     warpFakeDNS,
-    bestVSLESSTrojanInterval,
+    bestVSLESSTrrojjanInterval,
     bestWarpInterval,
     lengthMin,
     lengthMax,
@@ -7357,7 +7070,7 @@ function buildXrayConfig(proxySettings, remark, isFragment, isBalancer, isChain,
     intervalMax,
     fragmentPackets
   } = proxySettings;
-  const isFakeDNS = vslessTrojanFakeDNS && !isWarp || warpFakeDNS && isWarp;
+  const isFakeDNS = vslessTrrojjanFakeDNS && !isWarp || warpFakeDNS && isWarp;
   let config = structuredClone(xrayConfigTemp);
   config.remarks = remark;
   if (isFakeDNS) {
@@ -7375,7 +7088,7 @@ function buildXrayConfig(proxySettings, remark, isFragment, isBalancer, isChain,
     config.outbounds.shift();
   }
   if (isBalancer) {
-    const interval = isWarp ? bestWarpInterval : bestVSLESSTrojanInterval;
+    const interval = isWarp ? bestWarpInterval : bestVSLESSTrrojjanInterval;
     config.observatory.probeInterval = `${interval}s`;
     config.observatory.subjectSelector = [isChain ? "chain" : "prox"];
     config.routing.balancers[0].selector = [isChain ? "chain" : "prox"];
@@ -7465,7 +7178,7 @@ async function getXrayCustomConfigs(env, proxySettings, hostName, isFragment) {
     customCdnHost,
     customCdnSni,
     vslessConfigs,
-    trojanConfigs,
+    trrojjanConfigs,
     ports
   } = proxySettings;
   if (outProxy) {
@@ -7487,7 +7200,7 @@ async function getXrayCustomConfigs(env, proxySettings, hostName, isFragment) {
   const totalAddresses = isFragment ? [...Addresses] : [...Addresses, ...customCdnAddresses];
   const totalPorts = ports.filter((port) => isFragment ? defaultHttpsPorts.includes(port) : true);
   vslessConfigs && protocols.push(["V","LESS"].join(""));
-  trojanConfigs && protocols.push("Trojan");
+  trrojjanConfigs && protocols.push("Trrojjan");
   let proxyIndex = 1;
   for (const protocol of protocols) {
     let protocolIndex = 1;
@@ -7501,7 +7214,7 @@ async function getXrayCustomConfigs(env, proxySettings, hostName, isFragment) {
         let customConfig = buildXrayConfig(proxySettings, remark, isFragment, false, chainProxy, void 0, false);
         customConfig.dns = await buildXrayDNS(proxySettings, [addr], void 0);
         customConfig.routing.rules = buildXrayRoutingRules(proxySettings, [addr], chainProxy, false, false);
-        let outbound = protocol === ["V","LESS"].join("") ? buildXrayVSLESSOutbound("proxy", addr, port, host, sni, proxyIP2, isFragment, isCustomAddr) : buildXrayTrojanOutbound("proxy", addr, port, host, sni, proxyIP2, isFragment, isCustomAddr);
+        let outbound = protocol === ["V","LESS"].join("") ? buildXrayVSLESSOutbound("proxy", addr, port, host, sni, proxyIP2, isFragment, isCustomAddr) : buildXrayTrrojjanOutbound("proxy", addr, port, host, sni, proxyIP2, isFragment, isCustomAddr);
         customConfig.outbounds.unshift({ ...outbound });
         outbound.tag = `prox-${proxyIndex}`;
         if (chainProxy) {
@@ -7573,7 +7286,7 @@ async function buildClashDNS(proxySettings, isWarp) {
     remoteDNS,
     resolvedRemoteDNS,
     localDNS,
-    vslessTrojanFakeDNS,
+    vslessTrrojjanFakeDNS,
     warpFakeDNS,
     bypassLAN,
     bypassIran,
@@ -7582,7 +7295,7 @@ async function buildClashDNS(proxySettings, isWarp) {
   } = proxySettings;
   const finalRemoteDNS = isWarp ? ["1.1.1.1", "1.0.0.1"] : [remoteDNS];
   let clashLocalDNS = localDNS === "localhost" ? "system" : localDNS;
-  const isFakeDNS = vslessTrojanFakeDNS && !isWarp || warpFakeDNS && isWarp;
+  const isFakeDNS = vslessTrrojjanFakeDNS && !isWarp || warpFakeDNS && isWarp;
   let dns = {
     "enable": true,
     "listen": "0.0.0.0:1053",
@@ -7669,14 +7382,14 @@ function buildClashVSLESSOutbound(remark, address, port, host, sni, path, allowI
   }
   return outbound;
 }
-function buildClashTrojanOutbound(remark, address, port, host, sni, path, allowInsecure) {
+function buildClashTrrojjanOutbound(remark, address, port, host, sni, path, allowInsecure) {
   const addr = isIPv6(address) ? address.replace(/\[|\]/g, "") : address;
   return {
     "name": remark,
-    "type": "trojan",
+    "type": "trrojjan",
     "server": addr,
     "port": +port,
-    "password": trojanPassword,
+    "password": trrojjanPassword,
     "network": "ws",
     "udp": false,
     "ws-opts": {
@@ -7829,13 +7542,13 @@ async function getClashNormalConfig(env, proxySettings, hostName) {
     proxyIP: proxyIP2,
     ports,
     vslessConfigs,
-    trojanConfigs,
+    trrojjanConfigs,
     outProxy,
     outProxyParams,
     customCdnAddrs,
     customCdnHost,
     customCdnSni,
-    bestVSLESSTrojanInterval,
+    bestVSLESSTrrojjanInterval,
     enableIPv6
   } = proxySettings;
   if (outProxy) {
@@ -7859,20 +7572,20 @@ async function getClashNormalConfig(env, proxySettings, hostName) {
   const urlTest = config["proxy-groups"][1];
   selector.proxies = ["\u{1F4A6} Best Ping \u{1F4A5}"];
   urlTest.name = "\u{1F4A6} Best Ping \u{1F4A5}";
-  urlTest.interval = +bestVSLESSTrojanInterval;
+  urlTest.interval = +bestVSLESSTrrojjanInterval;
   const Addresses = await getConfigAddresses(hostName, cleanIPs, enableIPv6);
   const customCdnAddresses = customCdnAddrs ? customCdnAddrs.split(",") : [];
   const totalAddresses = [...Addresses, ...customCdnAddresses];
   let proxyIndex = 1, path;
   const protocols = [
     ...vslessConfigs ? [["V","LESS"].join("")] : [],
-    ...trojanConfigs ? ["Trojan"] : []
+    ...trrojjanConfigs ? ["Trrojjan"] : []
   ];
   protocols.forEach((protocol) => {
     let protocolIndex = 1;
     ports.forEach((port) => {
       totalAddresses.forEach((addr) => {
-        let VSLESSOutbound, TrojanOutbound;
+        let VSLESSOutbound, TrrojjanOutbound;
         const isCustomAddr = customCdnAddresses.includes(addr);
         const configType = isCustomAddr ? "C" : "";
         const sni = isCustomAddr ? customCdnSni : randomUpperCase(hostName);
@@ -7893,9 +7606,9 @@ async function getClashNormalConfig(env, proxySettings, hostName) {
           selector.proxies.push(remark);
           urlTest.proxies.push(remark);
         }
-        if (protocol === "Trojan" && defaultHttpsPorts.includes(port)) {
+        if (protocol === "Trrojjan" && defaultHttpsPorts.includes(port)) {
           path = `/tr${getRandomPath(16)}${proxyIP2 ? `/${btoa(proxyIP2)}` : ""}`;
-          TrojanOutbound = buildClashTrojanOutbound(
+          TrrojjanOutbound = buildClashTrrojjanOutbound(
             chainProxy ? `proxy-${proxyIndex}` : remark,
             addr,
             port,
@@ -7904,7 +7617,7 @@ async function getClashNormalConfig(env, proxySettings, hostName) {
             path,
             isCustomAddr
           );
-          config.proxies.push(TrojanOutbound);
+          config.proxies.push(TrrojjanOutbound);
           selector.proxies.push(remark);
           urlTest.proxies.push(remark);
         }
@@ -7925,7 +7638,7 @@ function buildSingBoxDNS(proxySettings, isChain, isWarp) {
   const {
     remoteDNS,
     localDNS,
-    vslessTrojanFakeDNS,
+    vslessTrrojjanFakeDNS,
     warpFakeDNS,
     bypassIran,
     bypassChina,
@@ -7934,7 +7647,7 @@ function buildSingBoxDNS(proxySettings, isChain, isWarp) {
     blockPorn
   } = proxySettings;
   let fakeip;
-  const isFakeDNS = vslessTrojanFakeDNS && !isWarp || warpFakeDNS && isWarp;
+  const isFakeDNS = vslessTrrojjanFakeDNS && !isWarp || warpFakeDNS && isWarp;
   const servers = [
     {
       address: isWarp ? "1.1.1.1" : remoteDNS,
@@ -8216,13 +7929,13 @@ function buildSingBoxVSLESSOutbound(proxySettings, remark, address, port, host, 
     };
   return outbound;
 }
-function buildSingBoxTrojanOutbound(proxySettings, remark, address, port, host, sni, allowInsecure, isFragment) {
+function buildSingBoxTrrojjanOutbound(proxySettings, remark, address, port, host, sni, allowInsecure, isFragment) {
   const { lengthMin, lengthMax, intervalMin, intervalMax, proxyIP: proxyIP2 } = proxySettings;
   const path = `/tr${getRandomPath(16)}${proxyIP2 ? `/${btoa(proxyIP2)}` : ""}`;
   const tls = defaultHttpsPorts.includes(port) ? true : false;
   let outbound = {
-    type: "trojan",
-    password: trojanPassword,
+    type: "trrojjan",
+    password: trrojjanPassword,
     server: address,
     server_port: +port,
     tls: {
@@ -8422,13 +8135,13 @@ async function getSingBoxCustomConfig(env, proxySettings, hostName, client, isFr
     cleanIPs,
     ports,
     vslessConfigs,
-    trojanConfigs,
+    trrojjanConfigs,
     outProxy,
     outProxyParams,
     customCdnAddrs,
     customCdnHost,
     customCdnSni,
-    bestVSLESSTrojanInterval,
+    bestVSLESSTrrojjanInterval,
     enableIPv6
   } = proxySettings;
   if (outProxy) {
@@ -8458,7 +8171,7 @@ async function getSingBoxCustomConfig(env, proxySettings, hostName, client, isFr
   const selector = config.outbounds[0];
   const urlTest = config.outbounds[1];
   selector.outbounds = ["\u{1F4A6} Best Ping \u{1F4A5}"];
-  urlTest.interval = `${bestVSLESSTrojanInterval}s`;
+  urlTest.interval = `${bestVSLESSTrrojjanInterval}s`;
   urlTest.tag = "\u{1F4A6} Best Ping \u{1F4A5}";
   const Addresses = await getConfigAddresses(hostName, cleanIPs, enableIPv6);
   const customCdnAddresses = customCdnAddrs ? customCdnAddrs.split(",") : [];
@@ -8467,13 +8180,13 @@ async function getSingBoxCustomConfig(env, proxySettings, hostName, client, isFr
   let proxyIndex = 1;
   const protocols = [
     ...vslessConfigs ? [["V","LESS"].join("")] : [],
-    ...trojanConfigs ? ["Trojan"] : []
+    ...trrojjanConfigs ? ["Trrojjan"] : []
   ];
   protocols.forEach((protocol) => {
     let protocolIndex = 1;
     totalPorts.forEach((port) => {
       totalAddresses.forEach((addr) => {
-        let VSLESSOutbound, TrojanOutbound;
+        let VSLESSOutbound, TrrojjanOutbound;
         const isCustomAddr = customCdnAddresses.includes(addr);
         const configType = isCustomAddr ? "C" : isFragment ? "F" : "";
         const sni = isCustomAddr ? customCdnSni : randomUpperCase(hostName);
@@ -8492,8 +8205,8 @@ async function getSingBoxCustomConfig(env, proxySettings, hostName, client, isFr
           );
           config.outbounds.push(VSLESSOutbound);
         }
-        if (protocol === "Trojan") {
-          TrojanOutbound = buildSingBoxTrojanOutbound(
+        if (protocol === "Trrojjan") {
+          TrrojjanOutbound = buildSingBoxTrrojjanOutbound(
             proxySettings,
             chainProxyOutbound ? `proxy-${proxyIndex}` : remark,
             addr,
@@ -8503,7 +8216,7 @@ async function getSingBoxCustomConfig(env, proxySettings, hostName, client, isFr
             isCustomAddr,
             isFragment
           );
-          config.outbounds.push(TrojanOutbound);
+          config.outbounds.push(TrrojjanOutbound);
         }
         if (chainProxyOutbound) {
           let chain = structuredClone(chainProxyOutbound);
@@ -8526,20 +8239,20 @@ async function getNormalConfigs(proxySettings, hostName, client) {
     proxyIP: proxyIP2,
     ports,
     vslessConfigs,
-    trojanConfigs,
+    trrojjanConfigs,
     outProxy,
     customCdnAddrs,
     customCdnHost,
     customCdnSni,
     enableIPv6
   } = proxySettings;
-  let vslessConfs = "", trojanConfs = "", chainProxy = "";
+  let vslessConfs = "", trrojjanConfs = "", chainProxy = "";
   let proxyIndex = 1;
   const Addresses = await getConfigAddresses(hostName, cleanIPs, enableIPv6);
   const customCdnAddresses = customCdnAddrs ? customCdnAddrs.split(",") : [];
   const totalAddresses = [...Addresses, ...customCdnAddresses];
   const alpn = client === "singbox" ? "http/1.1" : "h2,http/1.1";
-  const trojanPass = encodeURIComponent(trojanPassword);
+  const trrojjanPass = encodeURIComponent(trrojjanPassword);
   const earlyData = client === "singbox" ? "&eh=Sec-WebSocket-Protocol&ed=2560" : encodeURIComponent("?ed=2560");
   ports.forEach((port) => {
     totalAddresses.forEach((addr, index) => {
@@ -8549,14 +8262,14 @@ async function getNormalConfigs(proxySettings, hostName, client) {
       const host = isCustomAddr ? customCdnHost : hostName;
       const path = `${getRandomPath(16)}${proxyIP2 ? `/${encodeURIComponent(btoa(proxyIP2))}` : ""}${earlyData}`;
       const vslessRemark = encodeURIComponent(generateRemark(proxyIndex, port, addr, cleanIPs, ["V","LESS"].join(""), configType));
-      const trojanRemark = encodeURIComponent(generateRemark(proxyIndex, port, addr, cleanIPs, "Trojan", configType));
+      const trrojjanRemark = encodeURIComponent(generateRemark(proxyIndex, port, addr, cleanIPs, "Trrojjan", configType));
       const tlsFields = defaultHttpsPorts.includes(port) ? `&security=tls&sni=${sni}&fp=randomized&alpn=${alpn}` : "&security=none";
       if (vslessConfigs) {
         vslessConfs += `${atob("dmxlc3M")}://${userID}@${addr}:${port}?path=/${path}&encryption=none&host=${host}&type=ws${tlsFields}#${vslessRemark}
 `;
       }
-      if (trojanConfigs) {
-        trojanConfs += `${atob("dHJvamFu")}://${trojanPass}@${addr}:${port}?path=/tr${path}&host=${host}&type=ws${tlsFields}#${trojanRemark}
+      if (trrojjanConfigs) {
+        trrojjanConfs += `${atob("dHJvamFu")}://${trrojjanPass}@${addr}:${port}?path=/tr${path}&host=${host}&type=ws${tlsFields}#${trrojjanRemark}
 `;
       }
       proxyIndex++;
@@ -8573,7 +8286,7 @@ async function getNormalConfigs(proxySettings, hostName, client) {
       chainProxy = outProxy.split("#")[0] + chainRemark;
     }
   }
-  return btoa(vslessConfs + trojanConfs + chainProxy);
+  return btoa(vslessConfs + trrojjanConfs + chainProxy);
 }
 var xrayConfigTemp = {
   remarks: "",
