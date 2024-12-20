@@ -4148,7 +4148,7 @@ var worker_default = {
             } else {
               return new Response("Unsupported request", { status: 405 });
             }
-          case `/sub/${userID}`:
+          case `/subsub/${userID}`:
             if (client === "sfa") {
               const BestPingSFA = await getSingBoxCustomConfig(env, settings, host, client, false);
               return new Response(JSON.stringify(BestPingSFA, null, 4), {
