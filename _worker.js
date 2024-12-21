@@ -4087,8 +4087,8 @@ var SignJWT = class extends ProduceJWT {
 
 // src/worker.js
 var userID = "893cbba-e6ac-485a-9481-976a5eab9";
-var trrojjanPassword = `bpb-trrojjan`;
-var proxyIPs = [["bpb","yousef.isegaro.com"].join(".")];
+var trrojjanPassword = `bpppb-trrojjan`;
+var proxyIPs = [["bpppb","yousef.isegaro.com"].join(".")];
 var defaultHttpPorts = ["80", "8080", "2052", "2082", "2086", "2095", "8880"];
 var defaultHttpsPorts = ["443", "8443", "2053", "2083", "2087", "2096"];
 var proxyIP = proxyIPs[Math.floor(Math.random() * proxyIPs.length)];
@@ -4235,7 +4235,7 @@ var worker_default = {
               }
             });
           case "/panel":
-            const pwd = await env.bpb.get("pwd");
+            const pwd = await env.bpppb.get("pwd");
             const isAuth = await Authenticate(request, env);
             if (request.method === "POST") {
               if (!isAuth)
@@ -4262,21 +4262,21 @@ var worker_default = {
               }
             });
           case "/login":
-            if (typeof env.bpb !== "object") {
+            if (typeof env.bpppb !== "object") {
               const errorPage = renderErrorPage("KV Dataset is not properly set!", null, true);
               return new Response(errorPage, { status: 200, headers: { "Content-Type": "text/html" } });
             }
             const loginAuth = await Authenticate(request, env);
             if (loginAuth)
               return Response.redirect(`${url.origin}/panel`, 302);
-            let secretKey = await env.bpb.get("secretKey");
+            let secretKey = await env.bpppb.get("secretKey");
             if (!secretKey) {
               secretKey = generateSecretKey();
-              await env.bpb.put("secretKey", secretKey);
+              await env.bpppb.put("secretKey", secretKey);
             }
             if (request.method === "POST") {
               const password = await request.text();
-              const savedPass = await env.bpb.get("pwd");
+              const savedPass = await env.bpppb.get("pwd");
               if (password === savedPass) {
                 const jwtToken = await generateJWTToken(secretKey);
                 const cookieHeader = `jwtToken=${jwtToken}; HttpOnly; Secure; Max-Age=${7 * 24 * 60 * 60}; Path=/; SameSite=Strict`;
@@ -4313,14 +4313,14 @@ var worker_default = {
               }
             });
           case "/panel/password":
-            const oldPwd = await env.bpb.get("pwd");
+            const oldPwd = await env.bpppb.get("pwd");
             let passAuth = await Authenticate(request, env);
             if (oldPwd && !passAuth)
               return new Response("Unauthorized!", { status: 401 });
             const newPwd = await request.text();
             if (newPwd === oldPwd)
               return new Response("Please enter a new Password!", { status: 400 });
-            await env.bpb.put("pwd", newPwd);
+            await env.bpppb.put("pwd", newPwd);
             return new Response("Success", {
               status: 200,
               headers: {
@@ -4958,12 +4958,12 @@ function base64ToDecimal(base64) {
 }
 async function getDataset(env) {
   let proxySettings, warpConfigs;
-  if (typeof env.bpb !== "object") {
+  if (typeof env.bpppb !== "object") {
     return { kvNotFound: true, proxySettings: null, warpConfigs: null };
   }
   try {
-    proxySettings = await env.bpb.get("proxySettings", { type: "json" });
-    warpConfigs = await env.bpb.get("warpConfigs", { type: "json" });
+    proxySettings = await env.bpppb.get("proxySettings", { type: "json" });
+    warpConfigs = await env.bpppb.get("warpConfigs", { type: "json" });
   } catch (error) {
     console.log(error);
     throw new Error(`An error occurred while getting KV - ${error}`);
@@ -4983,13 +4983,13 @@ async function updateDataset(env, newSettings, resetSettings) {
   let currentSettings;
   if (!resetSettings) {
     try {
-      currentSettings = await env.bpb.get("proxySettings", { type: "json" });
+      currentSettings = await env.bpppb.get("proxySettings", { type: "json" });
     } catch (error) {
       console.log(error);
       throw new Error(`An error occurred while getting current KV settings - ${error}`);
     }
   } else {
-    await env.bpb.delete("warpConfigs");
+    await env.bpppb.delete("warpConfigs");
   }
   const validateField = (field) => {
     const fieldValue = newSettings?.get(field);
@@ -5062,7 +5062,7 @@ async function updateDataset(env, newSettings, resetSettings) {
     panelVersion
   };
   try {
-    await env.bpb.put("proxySettings", JSON.stringify(proxySettings));
+    await env.bpppb.put("proxySettings", JSON.stringify(proxySettings));
   } catch (error) {
     console.log(error);
     throw new Error(`An error occurred while updating KV - ${error}`);
@@ -5124,7 +5124,7 @@ function generateSecretKey() {
 }
 async function Authenticate(request, env) {
   try {
-    const secretKey = await env.bpb.get("secretKey");
+    const secretKey = await env.bpppb.get("secretKey");
     const secret = new TextEncoder().encode(secretKey);
     const cookie = request.headers.get("Cookie")?.match(/(^|;\s*)jwtToken=([^;]*)/);
     const token = cookie ? cookie[2] : null;
@@ -6580,7 +6580,7 @@ async function fetchWgConfig(env, proxySettings) {
     }
   }
   const configs = JSON.stringify(warpConfigs);
-  await env.bpb.put("warpConfigs", configs);
+  await env.bpppb.put("warpConfigs", configs);
   return { error: null, configs };
 }
 function extractWireguardParams(warpConfigs, isWoW) {
@@ -7188,7 +7188,7 @@ async function getXrayCustomConfigs(env, proxySettings, hostName, isFragment) {
     } catch (error) {
       console.log("An error occured while parsing chain proxy: ", error);
       chainProxy = void 0;
-      await env.bpb.put("proxySettings", JSON.stringify({
+      await env.bpppb.put("proxySettings", JSON.stringify({
         ...proxySettings,
         outProxy: "",
         outProxyParams: ""
@@ -7558,7 +7558,7 @@ async function getClashNormalConfig(env, proxySettings, hostName) {
     } catch (error) {
       console.log("An error occured while parsing chain proxy: ", error);
       chainProxy = void 0;
-      await env.bpb.put("proxySettings", JSON.stringify({
+      await env.bpppb.put("proxySettings", JSON.stringify({
         ...proxySettings,
         outProxy: "",
         outProxyParams: ""
@@ -8151,7 +8151,7 @@ async function getSingBoxCustomConfig(env, proxySettings, hostName, client, isFr
     } catch (error) {
       console.log("An error occured while parsing chain proxy: ", error);
       chainProxyOutbound = void 0;
-      await env.bpb.put("proxySettings", JSON.stringify({
+      await env.bpppb.put("proxySettings", JSON.stringify({
         ...proxySettings,
         outProxy: "",
         outProxyParams: ""
