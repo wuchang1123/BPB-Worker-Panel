@@ -4112,7 +4112,10 @@ var worker_default = {
         throw new Error(`Invalid UUID: ${userID}`);
       const upgradeHeader = request.headers.get("Upgrade");
       const url = new URL(request.url);
-      if (!upgradeHeader || upgradeHeader !== "websocket") {
+      if ( /pages\.dev/.test(request.headers.get("Host")) ) {
+        const errorPage = renderErrorPage(request.headers.get("Host") + "is not properly set!", null, true);
+        return new Response(errorPage, { status: 200, headers: { "Content-Type": "text/html" } });
+      } else if (!upgradeHeader || upgradeHeader !== "websocket") {
         const searchParams = new URLSearchParams(url.search);
         const host = request.headers.get("Host");
         const client = searchParams.get("app");
